@@ -1,38 +1,68 @@
 # chess.js
 
+[![Build Status](https://travis-ci.org/jhlywa/chess.js.svg?branch=master)](https://travis-ci.org/jhlywa/chess.js)
+
 chess.js is a Javascript chess library that is used for chess move
 generation/validation, piece placement/movement, and check/checkmate/stalemate
 detection - basically everything but the AI.
 
 chess.js has been extensively tested in node.js and most modern browsers.
 
+## Installation
+
+To install the stable version:
+
+```sh
+npm install --save chess.js
+```
+
+chess.js is also available via [CDNJS](https://cdnjs.com/libraries/chess.js):
+
+```html
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.2/chess.js"></script>
+```
+
 ## Example Code
 The code below plays a complete game of chess ... randomly.
 
 ```js
-var util = require('util'),
-    ch =  require('./chess');
-
-var chess = new ch.Chess();
+var Chess = require('./chess').Chess;
+var chess = new Chess();
 
 while (!chess.game_over()) {
-  util.puts('position: ' + chess.fen());
   var moves = chess.moves();
   var move = moves[Math.floor(Math.random() * moves.length)];
   chess.move(move);
-  util.puts('move: ' + move);
 }
+console.log(chess.pgn());
 ```
 
+## Sites Using chess.js
+
+- [chess.com](http://www.chess.com/)
+- [The Internet Chess Club (ICC)](http://www.chessclub.com/)
+- [lichess](http://lichess.org/tv)
+- [Redbull - Battle for the Queen](http://battleforthequeen.redbull.com/)
+- [Asm.js Chess Battle](https://developer.microsoft.com/en-us/microsoft-edge/testdrive/demos/chess/)
+- [3D Hartwig Chess](http://creativejs.com/2012/12/3d-hartwig-chess/)
+- [Scene VR](http://client.scenevr.com/?connect=chess.scenevr.hosting/chess.xml)
+- [Multiplayer Chess](http://chessapp.com/)
+- [Reti Chess](http://retichess.nodejitsu.com/)
+- [Chess Fork](http://www.chessfork.com/)
+- [Lozza](http://op12no2.me/posts/1641)
+- [angular-chess](http://theborakompanioni.github.io/angular-chess)
+- [Chessable](https://www.chessable.com)
+- [SlimChess](https://slimchess.com/now)
+
 Need a user interface?  Try Chris Oakman's excellent
-[chessboard.js](http://chessboardjs.com) library.  See 
+[chessboard.js](http://chessboardjs.com) library.  See
 [chessboard.js - Random vs Random](http://chessboardjs.com/examples#5002) for
 an example integration of chess.js with chessboard.js.
 
 ## API
 
 ### Constructor: Chess([ fen ])
-The Chess() constructor takes a optional parameter which specifies the board configuration
+The Chess() constructor takes an optional parameter which specifies the board configuration
 in [Forsyth-Edwards Notation](http://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation).
 
 ```js
@@ -68,6 +98,39 @@ chess.ascii();
 //          a  b  c  d  e  f  g  h'
 ```
 
+
+### .board()
+Returns an 2D array representation of the current position.  Empty squares are
+represented by `null`.
+
+```js
+var chess = new Chess();
+
+chess.board();
+// -> [[{type: 'r', color: 'b'},
+        {type: 'n', color: 'b'},
+        {type: 'b', color: 'b'},
+        {type: 'q', color: 'b'},
+        {type: 'k', color: 'b'},
+        {type: 'b', color: 'b'},
+        {type: 'n', color: 'b'},
+        {type: 'r', color: 'b'}],
+        [...],
+        [...],
+        [...],
+        [...],
+        [...],
+        [{type: 'r', color: 'w'},
+         {type: 'n', color: 'w'},
+         {type: 'b', color: 'w'},
+         {type: 'q', color: 'w'},
+         {type: 'k', color: 'w'},
+         {type: 'b', color: 'w'},
+         {type: 'n', color: 'w'},
+         {type: 'r', color: 'w'}]]
+```
+
+
 ### .clear()
 Clears the board.
 
@@ -93,7 +156,7 @@ chess.fen();
 ```
 
 ### .game_over()
-Returns true or false if the game has ended via checkmate, stalemate, or draw.
+Returns true if the game has ended via checkmate, stalemate, draw, threefold repetition, or insufficient material. Otherwise, returns false.
 
 ```js
 var chess = new Chess();
@@ -191,12 +254,12 @@ var chess = new Chess('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
 chess.in_threefold_repetition();
 // -> false
 
-chess.move('Nf3'); chess.move('Nf6') chess.move('Ng1'); chess.move('Ng8');
+chess.move('Nf3'); chess.move('Nf6'); chess.move('Ng1'); chess.move('Ng8');
 // rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq occurs 2nd time
 chess.in_threefold_repetition();
 // -> false
 
-chess.move('Nf3'); chess.move('Nf6') chess.move('Ng1'); chess.move('Ng8');
+chess.move('Nf3'); chess.move('Nf6'); chess.move('Ng1'); chess.move('Ng8');
 // rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq occurs 3rd time
 chess.in_threefold_repetition();
 // -> true
@@ -215,6 +278,13 @@ chess.header('Black', 'Mikhail Tal');
 chess.header('White', 'Morphy', 'Black', 'Anderssen', 'Date', '1858-??-??');
 ```
 
+Calling .header() without any arguments returns the header information as an object.
+
+```js
+chess.header();
+// -> { White: 'Morphy', Black: 'Anderssen', Date: '1858-??-??' }
+```
+
 ### .insufficient_material()
 Returns true if the game is drawn due to insufficient material (K vs. K,
 K vs. KB, or K vs. KN); otherwise false.
@@ -226,7 +296,7 @@ chess.insufficient_material()
 ```
 
 ### .load(fen)
-The board is cleared and the FEN string is loaded.  Returns true if position was
+The board is cleared, and the FEN string is loaded.  Returns true if the position was
 successfully loaded, otherwise false.
 
 ```js
@@ -241,9 +311,22 @@ chess.load('4r3/8/X12XPk/1p6/pP2p1R1/P1B5/2P2K2/3r4 w - - 1 45');
 ### .load_pgn(pgn, [ options ])
 Load the moves of a game stored in
 [Portable Game Notation](http://en.wikipedia.org/wiki/Portable_Game_Notation).
-Options is a optional parameter that contains a 'newline_char' which is a
-string representation of a RegExp (and should not be pre-escaped) and defaults
-to '\r?\n'). Returns true if the PGN was parsed successfully, otherwise false.
+`pgn` should be a string. Options is an optional `object` which may contain
+a string `newline_char` and a boolean `sloppy`.
+
+The `newline_char` is a string representation of a valid RegExp fragment and is
+used to process the PGN. It defaults to `\r?\n`. Special characters
+should not be pre-escaped, but any literal special characters should be escaped
+as is normal for a RegExp.  Keep in mind that backslashes in JavaScript strings
+must themselves be escaped (see `sloppy_pgn` example below). Avoid using
+a `newline_char` that may occur elsewhere in a PGN, such as `.` or `x`, as this
+will result in unexpected behavior.
+
+The `sloppy` flag is a boolean that permits chess.js to parse moves in
+non-standard notations. See `.move` documentation for more information about
+non-SAN notations.
+
+The method will return `true` if the PGN was parsed successfully, otherwise `false`.
 
 ```js
 var chess = new Chess();
@@ -269,10 +352,10 @@ pgn = ['[Event "Casual Game"]',
 chess.load_pgn(pgn.join('\n'));
 // -> true
 
-chess.fen()
+chess.fen();
 // -> 1r3kr1/pbpBBp1p/1b3P2/8/8/2P2q2/P4PPP/3R2K1 b - - 0 24
 
-chess.ascii()
+chess.ascii();
 // -> '  +------------------------+
 //     8 | .  r  .  .  .  k  r  . |
 //     7 | p  b  p  B  B  p  .  p |
@@ -284,9 +367,42 @@ chess.ascii()
 //     1 | .  .  .  R  .  .  K  . |
 //       +------------------------+
 //         a  b  c  d  e  f  g  h'
+
+
+// Parse non-standard move formats and unusual line separators
+var sloppy_pgn = ['[Event "Wijk aan Zee (Netherlands)"]',
+  '[Date "1971.01.26"]',
+  '[Result "1-0"]',
+  '[White "Tigran Vartanovich Petrosian"]',
+  '[Black "Hans Ree"]',
+  '[ECO "A29"]',
+  '',
+  '1. Pc2c4 Pe7e5', // non-standard
+  '2. Nc3 Nf6',
+  '3. Nf3 Nc6',
+  '4. g2g3 Bb4',    // non-standard
+  '5. Nd5 Nxd5',
+  '6. c4xd5 e5-e4', // non-standard
+  '7. dxc6 exf3',
+  '8. Qb3 1-0'
+].join('|');
+
+var options = {
+  newline_char: '\\|', // Literal '|' character escaped
+  sloppy: true
+};
+
+chess.load_pgn(sloppy_pgn);
+// -> false
+
+chess.load_pgn(sloppy_pgn, options);
+// -> true
+
+chess.fen();
+// -> 'r1bqk2r/pppp1ppp/2P5/8/1b6/1Q3pP1/PP1PPP1P/R1B1KB1R b KQkq - 1 8'
 ```
 
-### .move(move)
+### .move(move, [ options ])
 Attempts to make a move on the board, returning a move object if the move was
 legal, otherwise null.  The .move function can be called two ways, by passing
 a string in Standard Algebraic Notation (SAN):
@@ -314,8 +430,35 @@ chess.move({ from: 'g2', to: 'g3' });
 // -> { color: 'w', from: 'g2', to: 'g3', flags: 'n', piece: 'p', san: 'g3' }
 ```
 
+An optional sloppy flag can be used to parse a variety of non-standard move
+notations:
+
+```js
+
+var chess = new Chess();
+
+// various forms of Long Algebraic Notation
+chess.move('e2e4', {sloppy: true});
+// -> { color: 'w', from: 'e2', to: 'e4', flags: 'b', piece: 'p', san: 'e4' }
+chess.move('e7-e5', {sloppy: true});
+// -> { color: 'b', from: 'e7', to: 'e5', flags: 'b', piece: 'p', san: 'e5' }
+chess.move('Pf2f4', {sloppy: true});
+// -> { color: 'w', from: 'f2', to: 'f4', flags: 'b', piece: 'p', san: 'f4' }
+chess.move('Pe5xf4', {sloppy: true});
+// -> { color: 'b', from: 'e5', to: 'f4', flags: 'c', piece: 'p', captured: 'p', san: 'exf4' }
+
+
+// correctly parses incorrectly disambiguated moves
+chess = new Chess('r2qkbnr/ppp2ppp/2n5/1B2pQ2/4P3/8/PPP2PPP/RNB1K2R b KQkq - 3 7');
+
+chess.move('Nge7');  // Ne7 is unambiguous because the knight on c6 is pinned
+// -> null
+
+chess.move('Nge7', {sloppy: true});
+// -> { color: 'b', from: 'g8', to: 'e7', flags: 'n', piece: 'n', san: 'Ne7' }
+```
 ### .moves([ options ])
-Returns a list of legals moves from the current position.  The function takes an optional parameter which controls the single-square move generation and verbosity.
+Returns a list of legal moves from the current position.  The function takes an optional parameter which controls the single-square move generation and verbosity.
 
 ```js
 var chess = new Chess();
@@ -371,9 +514,9 @@ chess.pgn({ max_width: 5, newline_char: '<br />' });
 ```
 
 ### .put(piece, square)
-Place a piece on square where piece is an object with the form
-{ type: ..., color: ... }.  Returns true if piece was successfully placed,
-otherwise the board remains unchanged and false is returned.  `put()` will fail
+Place a piece on the square where piece is an object with the form
+{ type: ..., color: ... }.  Returns true if the piece was successfully placed,
+otherwise, the board remains unchanged and false is returned.  `put()` will fail
 when passed an invalid piece or square, or when two or more kings of the
 same color are placed.
 
@@ -457,7 +600,7 @@ chess.fen();
 chess.undo();
 // -> { color: 'w', from: 'e2', to: 'e4', flags: 'b', piece: 'p', san: 'e4' }
 chess.fen();
-// -> 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1'
+// -> 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
 chess.undo();
 // -> null
 ```
@@ -475,44 +618,20 @@ chess.validate_fen('4r3/8/X12XPk/1p6/pP2p1R1/P1B5/2P2K2/3r4 w - - 1 45');
 //     error: '1st field (piece positions) is invalid [invalid piece].' }
 ```
 
-
-## CONTRIBUTORS
-
-Special thanks to the following developers for their patches and contributions
-(alphabetically):
-
-- [Steve Bragg](https://github.com/2sb18)
-- [Matt Flaschen](https://github.com/mattflaschen)
-- [E. Azer Koçulu](https://github.com/azer)
-- [Falco Nogatz](https://github.com/fnogatz)
-- [jdponomarev](https://github.com/jdponomarev)
-- [Tom Offermann](https://github.com/toffer)
-- [David Moises Paz Reyes](https://github.com/davidmpaz)
-- [Raminder Singh](https://github.com/imor)
-- [Stiff](https://github.com/stiff)
-- [Seb Vincent](https://github.com/sebv)
-- [Linmiao Xu](https://github.com/linrock)
-- [Jonathan Zacsh](https://github.com/jzacsh)
+## MUSIC
 
 Musical support provided by:
 
-- [The Grateful Dead](http://www.youtube.com/watch?v=YLzUme1gN8c)
+- [The Grateful Dead](https://www.youtube.com/watch?feature=player_detailpage&v=ANF6qanEB7s#t=2999)
 - [Umphrey's McGee](http://www.youtube.com/watch?v=jh-1fFWkSdw)
-
-
 
 ## BUGS
 
 - The en passant square and castling flags aren't adjusted when using the put/remove functions (workaround: use .load() instead)
 
-
-
 ## TODO
 
-- Add AI (basic alpha-beta search w/ primitive position evaluation).  The AI
-  should probably be internal to the underlying Chess() object to take full
-  advantage of 0x88 move generation.
-- Add jQuery chessboard widget.  (see widget branch for prototype)
 - Investigate the use of piece lists (this may shave a few cycles off
-  generate_moves() and attacked())
-
+  generate_moves() and attacked()).
+- Refactor API to use camelCase - yuck.
+- Add more robust FEN validation.

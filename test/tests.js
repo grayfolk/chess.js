@@ -2,20 +2,10 @@ if (typeof require != "undefined") {
   var chai = require('chai');
   var Chess = require('../chess').Chess;
 }
+
 var assert = chai.assert;
 
-
-if (!Array.prototype.forEach) {
-  Array.prototype.forEach = function(fn, scope) {
-    for(var i = 0, len = this.length; i < len; ++i) {
-      fn.call(scope, this[i], i, this);
-    }
-  }
-}
-
-
-suite("Perft", function() {
-
+describe("Perft", function() {
   var perfts = [
     {fen: 'r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1',
       depth: 3, nodes: 97862},
@@ -31,17 +21,16 @@ suite("Perft", function() {
     var chess = new Chess();
     chess.load(perft.fen);
 
-    test(perft.fen, function() {
+    it(perft.fen, function() {
       var nodes = chess.perft(perft.depth);
       assert(nodes == perft.nodes);
     });
 
   });
-
 });
 
 
-suite("Single Square Move Generation", function() {
+describe("Single Square Move Generation", function() {
 
   var positions = [
     {fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
@@ -74,7 +63,7 @@ suite("Single Square Move Generation", function() {
     var chess = new Chess();
     chess.load(position.fen);
 
-    test(position.fen + ' ' + position.square, function() {
+    it(position.fen + ' ' + position.square, function() {
 
       var moves = chess.moves({square: position.square, verbose: position.verbose});
       var passed = position.moves.length == moves.length;
@@ -99,7 +88,7 @@ suite("Single Square Move Generation", function() {
 
 
 
-suite("Checkmate", function() {
+describe("Checkmate", function() {
 
   var chess = new Chess();
   var checkmates = [
@@ -112,7 +101,7 @@ suite("Checkmate", function() {
   checkmates.forEach(function(checkmate) {
     chess.load(checkmate);
 
-    test(checkmate, function() {
+    it(checkmate, function() {
       assert(chess.in_checkmate());
     });
   });
@@ -121,7 +110,7 @@ suite("Checkmate", function() {
 
 
 
-suite("Stalemate", function() {
+describe("Stalemate", function() {
 
   var stalemates = [
     '1R6/8/8/8/8/8/7R/k6K b - - 0 1',
@@ -132,7 +121,7 @@ suite("Stalemate", function() {
     var chess = new Chess();
     chess.load(stalemate);
 
-    test(stalemate, function() {
+    it(stalemate, function() {
       assert(chess.in_stalemate())
     });
 
@@ -141,7 +130,7 @@ suite("Stalemate", function() {
 });
 
 
-suite("Insufficient Material", function() {
+describe("Insufficient Material", function() {
 
   var positions = [
     {fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', draw: false},
@@ -159,7 +148,7 @@ suite("Insufficient Material", function() {
     var chess = new Chess();
     chess.load(position.fen);
 
-    test(position.fen, function() {
+    it(position.fen, function() {
       if (position.draw) {
         assert(chess.insufficient_material() && chess.in_draw());
       } else {
@@ -172,7 +161,7 @@ suite("Insufficient Material", function() {
 });
 
 
-suite("Threefold Repetition", function() {
+describe("Threefold Repetition", function() {
 
   var positions = [
     {fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
@@ -187,7 +176,7 @@ suite("Threefold Repetition", function() {
     var chess = new Chess();
     chess.load(position.fen);
 
-    test(position.fen, function() {
+    it(position.fen, function() {
 
       var passed = true;
       for (var j = 0; j < position.moves.length; j++) {
@@ -207,7 +196,7 @@ suite("Threefold Repetition", function() {
 });
 
 
-suite("Algebraic Notation", function() {
+describe("Algebraic Notation", function() {
 
   var positions = [
     {fen: '7k/3R4/3p2Q1/6Q1/2N1N3/8/8/3R3K w - - 0 1',
@@ -252,7 +241,7 @@ suite("Algebraic Notation", function() {
     var passed = true;
     chess.load(position.fen);
 
-    test(position.fen, function() {
+    it(position.fen, function() {
       var moves = chess.moves();
       if (moves.length != position.moves.length) {
         passed = false;
@@ -272,7 +261,7 @@ suite("Algebraic Notation", function() {
 });
 
 
-suite("Get/Put/Remove", function() {
+describe("Get/Put/Remove", function() {
 
   var chess = new Chess();
   var passed = true;
@@ -321,7 +310,7 @@ suite("Get/Put/Remove", function() {
     passed = true;
     chess.clear();
 
-    test("position should pass - " + position.should_pass, function() {
+    it("position should pass - " + position.should_pass, function() {
 
       /* places the pieces */
       for (var square in position.pieces) {
@@ -384,7 +373,7 @@ suite("Get/Put/Remove", function() {
 });
 
 
-suite("FEN", function() {
+describe("FEN", function() {
 
   var positions = [
     {fen: '8/8/8/8/8/8/8/8 w - - 0 1', should_pass: true},
@@ -405,7 +394,7 @@ suite("FEN", function() {
   positions.forEach(function(position) {
     var chess = new Chess();
 
-    test(position.fen + ' (' + position.should_pass + ')', function() {
+    it(position.fen + ' (' + position.should_pass + ')', function() {
       chess.load(position.fen);
       assert(chess.fen() == position.fen == position.should_pass);
     });
@@ -415,7 +404,7 @@ suite("FEN", function() {
 });
 
 
-suite("PGN", function() {
+describe("PGN", function() {
 
   var passed = true;
   var error_message;
@@ -461,7 +450,7 @@ suite("PGN", function() {
 
   positions.forEach(function(position, i) {
 
-    test(i, function() {
+    it(i, function() {
       var chess = ("starting_position" in position) ? new Chess(position.starting_position) : new Chess();
       passed = true;
       error_message = "";
@@ -484,7 +473,7 @@ suite("PGN", function() {
 });
 
 
-suite("Load PGN", function() {
+describe("Load PGN", function() {
 
   var chess = new Chess();
   var tests = [
@@ -535,6 +524,29 @@ suite("Load PGN", function() {
       'Queen.--Fischer} b5 10.Nxb5 cxb5 11.Bxb5+ Nbd7 12.O-O-O Rd8',
       '13.Rxd7 Rxd7 14.Rd1 Qe6 15.Bxd7+ Nxd7 16.Qb8+ Nxb8 17.Rd8# 1-0'],
       expect: true},
+    // Github Issue #134 - Load PGN with comment before first move
+    {fen : 'r1bqk2r/pp1nbppp/2p1pn2/3p4/2PP4/5NP1/PP2PPBP/RNBQ1RK1 w kq - 4 7',
+      pgn: [
+      '[Event "2012 ROCHESTER GRAND WINTER OPEN"]',
+      '[Site "Rochester"]',
+      '[Date "2012.02.04"]',
+      '[Round "1"]',
+      '[White "Jensen, Matthew"]',
+      '[Black "Gaustad, Kevin"]',
+      '[Result "1-0"]',
+      '[ECO "E01"]',
+      '[WhiteElo "2131"]',
+      '[BlackElo "1770"]',
+      '[Annotator "Jensen, Matthew"]',
+      '',
+      '{ Kevin and I go way back.  I checked the USCF player stats and my previous',
+      'record against Kevin was 4 losses and 1 draw out of 5 games.  All of our',
+      'previous games were between 1992-1998. }',
+      '1.d4 Nf6 2.c4 e6 3.g3 { Avrukh says',
+      'to play 3.g3 instead of 3.Nf3 in case the Knight later comes to e2, as in the',
+      'Bogo-Indian. } 3...d5 4.Bg2 c6 5.Nf3 Be7 6.O-O Nbd7',
+      '1-0'],
+      expect: true},
     {pgn: [
       '1. e4 e5 2. f4 exf4 3. Nf3 g5 4. h4 g4 5. Ne5 Nf6 6. Nxg4 Nxe4',
       '7. d3 Ng3 8. Bxf4 Nxh1 9. Qe2+ Qe7 10. Nf6+ Kd8 11. Bxc7+ Kxc7',
@@ -548,16 +560,200 @@ suite("Load PGN", function() {
      fen: 'rnbqk2r/pp1p1ppp/4pn2/1N6/1bP5/2N5/PP2PPPP/R1BQKB1R b KQkq - 2 6',
      expect: true},
     {pgn: ['1. e4 Qxd7 1/2-1/2'],
-      expect: false},
+     expect: false},
+    {pgn: ['1. e4!! e5?! 2. d4?? d5!?'],
+     fen: 'rnbqkbnr/ppp2ppp/8/3pp3/3PP3/8/PPP2PPP/RNBQKBNR w KQkq d6 0 3',
+     expect: true},
+    {pgn: ['1. e4!+'],
+     expect: false},
+    {pgn: ['1.e4 e6 2.d4 d5 3.exd5 c6?? 4.dxe6 Nf6?! 5.exf7+!! Kd7!? 6.Nf3 Bd6 7.f8=N+!! Qxf8'],
+     fen: 'rnb2q1r/pp1k2pp/2pb1n2/8/3P4/5N2/PPP2PPP/RNBQKB1R w KQ - 0 8',
+     expect: true},
+    {pgn: ['1. e4 ( 1. d4 { Queen\'s pawn } d5 ( 1... Nf6 ) ) e5'],
+     fen: 'rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2',
+     expect: true
+    },
+    {pgn: [
+      '1. e4 c5 2. Nf3 e6 { Sicilian Defence, French Variation } 3. Nc3 a6',
+      '4. Be2 Nc6 5. d4 cxd4 6. Nxd4 Qc7 7. O-O Nf6 8. Be3 Be7 9. f4 d6',
+      '10. Kh1 O-O 11. Qe1 Nxd4 12. Bxd4 b5 13. Qg3 Bb7 14. a3 Rad8',
+      '15. Rae1 Rd7 16. Bd3 Qd8 17. Qh3 g6? { (0.05 → 1.03) Inaccuracy.',
+      'The best move was h6. } (17... h6 18. Rd1 Re8 19. Qg3 Nh5 20. Qg4',
+      'Nf6 21. Qh3 Bc6 22. Kg1 Qb8 23. Qg3 Nh5 24. Qf2 Bf6 25. Be2 Bxd4',
+      '26. Rxd4 Nf6 27. g3) 18. f5 e5'],
+     fen: '3q1rk1/1b1rbp1p/p2p1np1/1p2pP2/3BP3/P1NB3Q/1PP3PP/4RR1K w - - 0 19',
+     expect: true},
+    {pgn: [
+      '1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5 4. b4 Bb6 5. a4 a6 6. c3 Nf6 7. d3 d6',
+      '8. Nbd2 O-O 9. O-O Ne7 10. d4 Ng6 11. dxe5 Nxe5 12. Nxe5 dxe5 13. Qb3 Ne8',
+      '14. Nf3 Nd6 15. Rd1 Bg4 16. Be2 Qf6 17. c4 Bxf3 18. Bxf3 Bd4 19. Rb1 b5 $2',
+      '20. c5 Nc4 21. Rf1 Qg6 22. Qc2 c6 23. Be2 Rfd8 24. a5 h5 $2 (24... Rd7 $11)',
+      '25. Rb3 $1 h4 26. Rh3 Qf6 27. Rf3'],
+     fen: 'r2r2k1/5pp1/p1p2q2/PpP1p3/1PnbP2p/5R2/2Q1BPPP/2B2RK1 b - - 3 27',
+     expect: true},
+    {pgn: [
+      '1. d4 d5 2. Bf4 Nf6 3. e3 g6 4. Nf3 (4. Nc3 Bg7 5. Nf3 O-O 6. Be2 c5)',
+      '4... Bg7 5. h3 { 5. Be2 O-O 6. O-O c5 7. c3 Nc6 } 5... O-O'],
+     fen: 'rnbq1rk1/ppp1ppbp/5np1/3p4/3P1B2/4PN1P/PPP2PP1/RN1QKB1R w KQ - 1 6',
+     expect: true},
+
+    // test the sloppy PGN parser
+    {pgn: [
+      '1.e4 e5 2.Nf3 d6 3.d4 Bg4 4.dxe5 Bxf3 5.Qxf3 dxe5 6.Qf5 Nc6 7.Bb5 Nge7',
+      '8.Qxe5 Qd7 9.O-O Nxe5 10.Bxd7+ Nxd7 11.Rd1 O-O-O 12.Nc3 Ng6 13.Be3 a6',
+      '14.Ba7 b6 15.Na4 Kb7 16.Bxb6 cxb6 17.b3 b5 18.Nb2 Nge5 19.f3 Rc8',
+      '20.Rac1 Ba3 21.Rb1 Rxc2 22.f4 Ng4 23.Rxd7+ Kc6 24.Rxf7 Bxb2 25.Rxg7',
+      'Ne3 26.Rg3 Bd4 27.Kh1 Rxa2 28.Rc1+ Kb6 29.e5 Rf8 30.e6 Rxf4 31.e7 Re4',
+      '32.Rg7 Bxg7'],
+      fen: '8/4P1bp/pk6/1p6/4r3/1P2n3/r5PP/2R4K w - - 0 33',
+      expect: false,
+      sloppy: false},
+
+    {pgn: [
+      '1.e4 e5 2.Nf3 d6 3.d4 Bg4 4.dxe5 Bxf3 5.Qxf3 dxe5 6.Qf5 Nc6 7.Bb5 Nge7',
+      '8.Qxe5 Qd7 9.O-O Nxe5 10.Bxd7+ Nxd7 11.Rd1 O-O-O 12.Nc3 Ng6 13.Be3 a6',
+      '14.Ba7 b6 15.Na4 Kb7 16.Bxb6 cxb6 17.b3 b5 18.Nb2 Nge5 19.f3 Rc8',
+      '20.Rac1 Ba3 21.Rb1 Rxc2 22.f4 Ng4 23.Rxd7+ Kc6 24.Rxf7 Bxb2 25.Rxg7',
+      'Ne3 26.Rg3 Bd4 27.Kh1 Rxa2 28.Rc1+ Kb6 29.e5 Rf8 30.e6 Rxf4 31.e7 Re4',
+      '32.Rg7 Bxg7'],
+      fen: '8/4P1bp/pk6/1p6/4r3/1P2n3/r5PP/2R4K w - - 0 33',
+      expect: true,
+      sloppy: true},
+
+
+    // the sloppy PGN parser should still accept correctly disambiguated moves
+    {pgn: [
+      '1.e4 e5 2.Nf3 d6 3.d4 Bg4 4.dxe5 Bxf3 5.Qxf3 dxe5 6.Qf5 Nc6 7.Bb5 Ne7',
+      '8.Qxe5 Qd7 9.O-O Nxe5 10.Bxd7+ Nxd7 11.Rd1 O-O-O 12.Nc3 Ng6 13.Be3 a6',
+      '14.Ba7 b6 15.Na4 Kb7 16.Bxb6 cxb6 17.b3 b5 18.Nb2 Nge5 19.f3 Rc8',
+      '20.Rac1 Ba3 21.Rb1 Rxc2 22.f4 Ng4 23.Rxd7+ Kc6 24.Rxf7 Bxb2 25.Rxg7',
+      'Ne3 26.Rg3 Bd4 27.Kh1 Rxa2 28.Rc1+ Kb6 29.e5 Rf8 30.e6 Rxf4 31.e7 Re4',
+      '32.Rg7 Bxg7'],
+      fen: '8/4P1bp/pk6/1p6/4r3/1P2n3/r5PP/2R4K w - - 0 33',
+      expect: true,
+      sloppy: true},
+
+    {pgn: [
+      '1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 4.Ng5 d5 5.exd5 Nxd5 6.Nxf7 Kxf7 7.Qf3+',
+      'Ke6 8.Nc3 Nb4'],
+      fen: 'r1bq1b1r/ppp3pp/4k3/3np3/1nB5/2N2Q2/PPPP1PPP/R1B1K2R w KQ - 4 9',
+      expect: true,
+      sloppy: true
+    },
+
+
+    // the sloppy parser should handle lazy disambiguation (e.g. Rc1c4 below)
+    {pgn: [
+      '1.e4 e5 2. Nf3 d5 3. Nxe5 f6 4. Bb5+ c6 5. Qh5+ Ke7',
+      'Qf7+ Kd6 7. d3 Kxe5 8. Qh5+ g5 9. g3 cxb5 10. Bf4+ Ke6',
+      'exd5+ Qxd5 12. Qe8+ Kf5 13. Rg1 gxf4 14. Nc3 Qc5 15. Ne4 Qxf2+',
+      'Kxf2 fxg3+ 17. Rxg3 Nd7 18. Qh5+ Ke6 19. Qe8+ Kd5 20. Rg4 Rb8',
+      'c4+ Kc6 22. Qe6+ Kc7 23. cxb5 Ne7 24. Rc1+ Kd8 25. Nxf6 Ra8',
+      'Kf1 Rb8 27. Rc1c4 b6 28. Rc4-d4 Rb7 29. Qf7 Rc7 30. Qe8# 1-0'],
+      fen: '2bkQb1r/p1rnn2p/1p3N2/1P6/3R2R1/3P4/PP5P/5K2 b - - 5 30',
+      expect: true,
+      sloppy: true
+    },
+
+    // sloppy parse should parse long algebraic notation
+    {pgn: [
+      'e2e4 d7d5 e4d5 d8d5 d2d4 g8f6 c2c4 d5d8 g1f3 c8g4 f1e2 e7e6 b1c3 f8e7',
+      'c1e3 e8g8 d1b3 b8c6 a1d1 a8b8 e1g1 d8c8 h2h3 g4h5 d4d5 e6d5 c4d5 h5f3',
+      'e2f3 c6e5 f3e2 a7a6 e3a7 b8a8 a7d4 e7d6 b3c2 f8e8 f2f4 e5d7 e2d3 c7c5',
+      'd4f2 d6f4 c3e4 f6d5 e4d6 f4d6 d3h7'],
+      fen: 'r1q1r1k1/1p1n1ppB/p2b4/2pn4/8/7P/PPQ2BP1/3R1RK1 b - - 0 25',
+      expect: true,
+      sloppy: true,
+    },
+
+    // sloppy parse should parse extended long algebraic notation w/ en passant
+    {pgn: [
+      '1. d2d4 f7f5 2. b2b3 e7e6 3. c1b2 d7d5 4. g1f3 f8d6 5. e2e3 g8f6 6. b1d2',
+      'e8g8 7. c2c4 c7c6 8. f1d3 b8d7 9. e1g1 f6e4 10. a1c1 g7g5 11. h2h3 d8e8 12.',
+      'd3e4 d5e4 13. f3g5 e8g6 14. h3h4 h7h6 15. g5h3 d7f6 16. f2f4 e4f3 17. d2f3',
+      'f6g4 18. d1e2 d6g3 19. h3f4 g6g7 20. d4d5 g7f7 21. d5e6 c8e6 22. f3e5 g4e5',
+      '23. b2e5 g8h7 24. h4h5 f8g8 25. e2f3 g3f4 26. e5f4 g8g4 27. g2g3 a8g8 28.',
+      'c1c2 b7b5 29. c4b5 e6d5 30. f3d1 f7h5 31. c2h2 g4g3+ 32. f4g3 g8g3+ 33.',
+      'g1f2 h5h2+ 34. f2e1 g3g2 35. d1d3 d5e4 36. d3d7+ h7g6 37. b5c6 g2e2+ 38.',
+      'e1d1 e2a2 0-1'],
+      fen: '8/p2Q4/2P3kp/5p2/4b3/1P2P3/r6q/3K1R2 w - - 0 39',
+      expect: true,
+      sloppy: true
+    },
+
+    // sloppy parse should parse long algebraic notation w/ underpromotions
+    {pgn: [
+      '1. e2e4 c7c5 2. g1f3 d7d6 3. d2d4 c5d4 4. f3d4 g8f6 5. f1d3 a7a6 6. c1e3',
+      'e7e5 7. d4f5 c8f5 8. e4f5 d6d5 9. e3g5 f8e7 10. d1e2 e5e4 11. g5f6 e7f6 12.',
+      'd3e4 d5e4 13. e2e4+ d8e7 14. e4e7+ f6e7 15. e1g1 e8g8 16. f1e1 e7f6 17.',
+      'c2c3 b8c6 18. b1d2 a8d8 19. d2e4 f8e8 20. e1e3 c6e5 21. a1e1 e5d3 22. e4f6+',
+      'g7f6 23. e3e8+ d8e8 24. e1e8+ g8g7 25. b2b4 d3e5 26. a2a4 b7b5 27. a4b5',
+      'a6b5 28. e8b8 e5g4 29. b8b5 g4e5 30. b5c5 g7f8 31. b4b5 f8e7 32. f2f4 e5d7',
+      '33. c5c7 e7d6 34. c7c8 d7b6 35. c8c6+ d6d7 36. c6b6 h7h5 37. b6f6 h5h4 38.',
+      'f6f7+ d7d6 39. f7h7 h4h3 40. h7h3 d6e7 41. b5b6 e7f6 42. h3h5 f6g7 43. b6b7',
+      'g7g8 44. b7b8N g8g7 45. c3c4 g7f6 46. c4c5 f6e7 47. c5c6 e7f6 48. c6c7 f6e7',
+      '49. c7c8B e7d6 50. b8a6 d6e7 51. c8e6 e7f6 52. a6c5 f6g7 53. c5e4 g7f8 54.',
+      'h5h8+ f8g7 55. h8g8+ g7h6 56. g8g6+ h6h7 57. e4f6+ h7h8 58. f6e4 h8h7 59.',
+      'f5f6 h7g6 60. f6f7 g6h5 61. f7f8R h5h6 62. f4f5 h6h7 63. f8f7+ h7h6 64.',
+      'f5f6 h6g6 65. f7g7+ g6h5 66. f6f7 h5h4 67. f7f8Q h4h5 68. f8h8# 1-0'],
+      fen: '7Q/6R1/4B3/7k/4N3/8/6PP/6K1 b - - 2 68',
+      expect: true,
+      sloppy: true
+    },
+
+    // sloppy parse should parse abbreviated long algebraic notation
+    {pgn: [
+      '1. d2d4 f7f5 2. Bc1g5 d7d6 3. e2e3 Nb8d7 4. c2c4 Ng8f6 5. Nb1c3 e7e5 6.',
+      'd4e5 d6e5 7. g2g3 Bf8e7 8. Bf1h3 h7h6 9. Bg5f6 Nd7f6 10. Qd1d8+ Be7d8 11.',
+      'Ng1f3 e5e4 12. Nf3d4 g7g6 13. e1g1 c7c5 14. Nd4b5 e8g8 15. Nb5d6 Bd8c7 16.',
+      'Nd6c8 Ra8c8 17. Rf1d1 Rc8d8 18. Bh3f1 b7b6 19. Nc3d5 Nf6d5 20. c4d5 Rf8e8',
+      '21. Bf1b5 Re8e5 22. Bb5c6 Kg8f7 23. Kg1f1 Kf7f6 24. h2h4 g6g5 25. h4g5+',
+      'h6g5 26. Kf1e2 Rd8h8 27. Rd1h1 Rh8h1 28. Ra1h1 Kf6g7 29. Rh1h5 Kg7g6 30.',
+      'Rh5h8 Re5e7 31. Rh8a8 a7a5 32. Ra8a7 Kg6f6 33. Ra7b7 Kf6e5 34. Ke2d2 f5f4',
+      '35. g3f4+ g5f4 36. Kd2c3 f4e3 37. f2e3 Re7f7 38. Kc3c4 Ke5d6 39. a2a3 Rf7f3',
+      '40. b2b4 a5b4 41. a3b4 c5b4 42. Kc4b4 Rf3e3 43. Kb4c4 Re3a3 44. Kc4b4 e4e3',
+      '45. Bc6b5 Ra3a1 46. Kb4c3 Ra1a3+ 47. Kc3d4 Ra3b3 48. Bb5e2 Rb3b4+ 49. Kd4e3',
+      'Rb4h4 50. Be2f3 Rh4h3 51. Rb7a7 Rh3f3+ 52. Ke3f3 b6b5 53. Kf3e4 Kd6c5 54.',
+      'Ra7b7 Bc7b6 55. Ke4e5 b5b4 56. d5d6 b4b3 57. Rb7b6 Kc5b6 58. d6d7 Kb6c7 59.',
+      'Ke5e6 1-0'],
+      fen: '8/2kP4/4K3/8/8/1p6/8/8 b - - 2 59',
+      expect: true,
+      sloppy: true
+    },
+
+    // sloppy parse should parse extended long algebraic notation
+    {pgn: [
+      '1. e2-e4 c7-c5 2. Ng1-f3 d7-d6 3. d2-d4 c5xd4 4. Nf3xd4 Ng8-f6 5. Bf1-d3',
+      'a7-a6 6. Bc1-e3 e7-e5 7. Nd4-f5 Bc8xf5 8. e4xf5 d6-d5 9. Be3-g5 Bf8-e7 10.',
+      'Qd1-e2 e5-e4 11. Bg5xf6 Be7xf6 12. Bd3xe4 d5xe4 13. Qe2xe4+ Qd8-e7 14.',
+      'Qe4xe7+ Bf6xe7 15. e1-g1 e8-g8 16. Rf1-e1 Be7-f6 17. c2-c3 Nb8-c6 18.',
+      'Nb1-d2 Ra8-d8 19. Nd2-e4 Rf8-e8 20. Re1-e3 Nc6-e5 21. Ra1-e1 Ne5-d3 22.',
+      'Ne4xf6+ g7xf6 23. Re3xe8+ Rd8xe8 24. Re1xe8+ Kg8-g7 25. b2-b4 Nd3-e5 26.',
+      'a2-a4 b7-b5 27. a4xb5 a6xb5 28. Re8-b8 Ne5-g4 29. Rb8xb5 Ng4-e5 30. Rb5-c5',
+      'Kg7-f8 31. b4-b5 Kf8-e7 32. f2-f4 Ne5-d7 33. Rc5-c7 Ke7-d6 34. Rc7-c8',
+      'Nd7-b6 35. Rc8-c6+ Kd6-d7 36. Rc6xb6 h7-h5 37. Rb6xf6 h5-h4 38. Rf6xf7+',
+      'Kd7-d6 39. Rf7-h7 h4-h3 40. Rh7xh3 Kd6-e7 41. b5-b6 Ke7-f6 42. Rh3-h5',
+      'Kf6-g7 43. b6-b7 Kg7-g8 44. b7-b8N Kg8-g7 45. c3-c4 Kg7-f6 46. c4-c5 Kf6-e7',
+      '47. c5-c6 Ke7-f6 48. c6-c7 Kf6-e7 49. c7-c8B Ke7-d6 50. Nb8-a6 Kd6-e7 51.',
+      'Bc8-e6 Ke7-f6 52. Na6-c5 Kf6-g7 53. Nc5-e4 Kg7-f8 54. Rh5-h8+ Kf8-g7 55.',
+      'Rh8-g8+ Kg7-h6 56. Rg8-g6+ Kh6-h7 57. Ne4-f6+ Kh7-h8 58. Nf6-e4 Kh8-h7 59.',
+      'f5-f6 Kh7xg6 60. f6-f7 Kg6-h5 61. f7-f8R Kh5-h6 62. f4-f5 Kh6-h7 63.',
+      'Rf8-f7+ Kh7-h6 64. f5-f6 Kh6-g6 65. Rf7-g7+ Kg6-h5 66. f6-f7 Kh5-h4 67.',
+      'f7-f8Q Kh4-h5 68. Qf8-h8# 1-0'],
+      fen: '7Q/6R1/4B3/7k/4N3/8/6PP/6K1 b - - 2 68',
+      expect: true,
+      sloppy: true
+    },
   ];
 
   var newline_chars = ['\n', '<br />', '\r\n', 'BLAH'];
 
   tests.forEach(function(t, i) {
     newline_chars.forEach(function(newline, j) {
-      test(i + String.fromCharCode(97 + j), function() {
-
-        var result = chess.load_pgn(t.pgn.join(newline), { newline_char: newline });
+      it(i + String.fromCharCode(97 + j), function() {
+        var sloppy = t.sloppy || false;
+        var result = chess.load_pgn(t.pgn.join(newline), {sloppy: sloppy,
+                                                          newline_char: newline});
         var should_pass = t.expect;
 
         /* some tests are expected to fail */
@@ -567,12 +763,12 @@ suite("Load PGN", function() {
          * so we'll need compare the results of the load against a FEN string
          * (instead of the reconstructed PGN [e.g. test.pgn.join(newline)])
          */
-
           if ('fen' in t) {
             assert(result && chess.fen() == t.fen);
           } else {
             assert(result && chess.pgn({ max_width: 65, newline_char: newline }) == t.pgn.join(newline));
           }
+
         } else {
           /* this test should fail, so make sure it does */
           assert(result == should_pass);
@@ -583,8 +779,8 @@ suite("Load PGN", function() {
 
   });
 
-// special case dirty file containing a mix of \n and \r\n
-  test('dirty pgn', function() {
+  // special case dirty file containing a mix of \n and \r\n
+  it('dirty pgn', function() {
     var pgn =
          '[Event "Reykjavik WCh"]\n' +
          '[Site "Reykjavik WCh"]\n' +
@@ -618,7 +814,7 @@ suite("Load PGN", function() {
 });
 
 
-suite("Make Move", function() {
+describe("Make Move", function() {
 
   var positions = [
     {fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
@@ -641,14 +837,40 @@ suite("Make Move", function() {
      legal: true,
      move: 'fxe3',
      next: 'rnbqkbnr/pppp2pp/8/4p3/8/2PPp3/PP3PPP/RNBQKBNR w KQkq - 0 2',
-     captured: 'p'}
+     captured: 'p'},
+
+     // strict move parser
+    {fen: 'r2qkbnr/ppp2ppp/2n5/1B2pQ2/4P3/8/PPP2PPP/RNB1K2R b KQkq - 3 7',
+     legal: true,
+     next: 'r2qkb1r/ppp1nppp/2n5/1B2pQ2/4P3/8/PPP2PPP/RNB1K2R w KQkq - 4 8',
+     move: 'Ne7'},
+
+     // strict move parser should reject over disambiguation
+    {fen: 'r2qkbnr/ppp2ppp/2n5/1B2pQ2/4P3/8/PPP2PPP/RNB1K2R b KQkq - 3 7',
+     legal: false,
+     move: 'Nge7'},
+
+     // sloppy move parser
+    {fen: 'r2qkbnr/ppp2ppp/2n5/1B2pQ2/4P3/8/PPP2PPP/RNB1K2R b KQkq - 3 7',
+     legal: true,
+     sloppy: true,
+     move: 'Nge7',
+     next: 'r2qkb1r/ppp1nppp/2n5/1B2pQ2/4P3/8/PPP2PPP/RNB1K2R w KQkq - 4 8'},
+
+     // the sloppy parser should still accept correctly disambiguated moves
+    {fen: 'r2qkbnr/ppp2ppp/2n5/1B2pQ2/4P3/8/PPP2PPP/RNB1K2R b KQkq - 3 7',
+     legal: true,
+     sloppy: true,
+     move: 'Ne7',
+     next: 'r2qkb1r/ppp1nppp/2n5/1B2pQ2/4P3/8/PPP2PPP/RNB1K2R w KQkq - 4 8'}
   ];
 
   positions.forEach(function(position) {
     var chess = new Chess();
     chess.load(position.fen);
-    test(position.fen + ' (' + position.move + ' ' + position.legal + ')', function() {
-      var result = chess.move(position.move);
+    it(position.fen + ' (' + position.move + ' ' + position.legal + ')', function() {
+      var sloppy = position.sloppy || false;
+      var result = chess.move(position.move, {sloppy: sloppy});
       if (position.legal) {
         assert(result
                && chess.fen() == position.next
@@ -663,7 +885,7 @@ suite("Make Move", function() {
 });
 
 
-suite("Validate FEN", function() {
+describe("Validate FEN", function() {
 
   var chess = new Chess();
   var positions = [
@@ -684,6 +906,8 @@ suite("Validate FEN", function() {
     {fen: 'rnbqk?nr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',  error_number: 9},
     {fen: 'rnbqkbnr/pppppppp/7/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',  error_number: 10},
     {fen: 'rnbqkbnr/p1p1p1p1p/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', error_number: 10},
+    {fen: 'r1bqkbnr/2pppppp/n7/1p6/8/4P3/PPPP1PPP/RNBQK1NR b KQkq b6 0 4', error_number: 11},
+    {fen: 'rnbqkbnr/1p1ppppp/B1p5/8/6P1/4P3/PPPP1P1P/RNBQK1NR w KQkq g3 0 3', error_number: 11},
     {fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',  error_number: 0},
     {fen: 'rnbqkbnr/pppp1ppp/8/4p3/2P5/8/PP1PPPPP/RNBQKBNR w KQkq e6 0 2', error_number: 0},
     {fen: '3r2k1/p1q2pp1/2nr1n1p/2p1p3/4P2B/P1P2Q1P/B4PP1/1R2R1K1 b - - 3 20', error_number: 0},
@@ -793,7 +1017,7 @@ suite("Validate FEN", function() {
 
   positions.forEach(function(position) {
 
-    test(position.fen + ' (valid: ' + (position.error_number  == 0) + ')', function() {
+    it(position.fen + ' (valid: ' + (position.error_number  == 0) + ')', function() {
       var result = chess.validate_fen(position.fen);
       assert(result.error_number == position.error_number, result.error_number);
     });
@@ -801,7 +1025,7 @@ suite("Validate FEN", function() {
   });
 });
 
-suite("History", function() {
+describe("History", function() {
 
   var chess = new Chess();
   var tests = [
@@ -905,7 +1129,7 @@ suite("History", function() {
   tests.forEach(function(t, i) {
     var passed = true;
 
-    test(i, function() {
+    it(i, function() {
       chess.reset();
 
       for (var j = 0; j < t.moves.length; j++) {
@@ -940,19 +1164,216 @@ suite("History", function() {
   });
 });
 
-suite('Regression Tests', function() {
-  // Github Issue #32 reported by AlgoTrader
-  test('Issue #32 - castling flag reappearing', function() {
+describe('Board Tests', function() {
+
+  var tests = [
+    {fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+      board: [[{type: 'r', color: 'b'},
+               {type: 'n', color: 'b'},
+               {type: 'b', color: 'b'},
+               {type: 'q', color: 'b'},
+               {type: 'k', color: 'b'},
+               {type: 'b', color: 'b'},
+               {type: 'n', color: 'b'},
+               {type: 'r', color: 'b'}],
+              [{type: 'p', color: 'b'},
+               {type: 'p', color: 'b'},
+               {type: 'p', color: 'b'},
+               {type: 'p', color: 'b'},
+               {type: 'p', color: 'b'},
+               {type: 'p', color: 'b'},
+               {type: 'p', color: 'b'},
+               {type: 'p', color: 'b'}],
+              [null, null, null, null, null, null, null, null],
+              [null, null, null, null, null, null, null, null],
+              [null, null, null, null, null, null, null, null],
+              [null, null, null, null, null, null, null, null],
+              [{type: 'p', color: 'w'},
+               {type: 'p', color: 'w'},
+               {type: 'p', color: 'w'},
+               {type: 'p', color: 'w'},
+               {type: 'p', color: 'w'},
+               {type: 'p', color: 'w'},
+               {type: 'p', color: 'w'},
+               {type: 'p', color: 'w'}],
+              [{type: 'r', color: 'w'},
+               {type: 'n', color: 'w'},
+               {type: 'b', color: 'w'},
+               {type: 'q', color: 'w'},
+               {type: 'k', color: 'w'},
+               {type: 'b', color: 'w'},
+               {type: 'n', color: 'w'},
+               {type: 'r', color: 'w'}]]},
+    // checkmate
+	{fen: 'r3k2r/ppp2p1p/2n1p1p1/8/2B2P1q/2NPb1n1/PP4PP/R2Q3K w kq - 0 8',
+	  board:[[{type: 'r', color: 'b'},
+			  null,
+			  null,
+			  null,
+			  {type: 'k', color: 'b'},
+			  null,
+			  null,
+			  {type: 'r', color: 'b'}],
+		     [{type: 'p', color: 'b'},
+		      {type: 'p', color: 'b'},
+		      {type: 'p', color: 'b'},
+		      null,
+		      null,
+		      {type: 'p', color: 'b'},
+		      null,
+		      {type: 'p', color: 'b'}],
+		     [null,
+		      null,
+		      {type: 'n', color: 'b'},
+		      null,
+		      {type: 'p', color: 'b'},
+		      null,
+		      {type: 'p', color: 'b'},
+		      null],
+		     [null, null, null, null, null, null, null, null],
+		     [null,
+		      null,
+		      {type: 'b', color: 'w'},
+		      null,
+		      null,
+		      {type: 'p', color: 'w'},
+		      null,
+		      {type: 'q', color: 'b'}],
+		     [null,
+		      null,
+		      {type: 'n', color: 'w'},
+		      {type: 'p', color: 'w'},
+		      {type: 'b', color: 'b'},
+		      null,
+		      {type: 'n', color: 'b'},
+		      null],
+		     [{type: 'p', color: 'w'},
+		      {type: 'p', color: 'w'},
+		      null,
+		      null,
+		      null,
+		      null,
+		      {type: 'p', color: 'w'},
+		      {type: 'p', color: 'w'}],
+		     [{type: 'r', color: 'w'},
+		      null,
+		      null,
+		      {type: 'q', color: 'w'},
+		      null,
+		      null,
+		      null,
+		      {type: 'k', color: 'w'}]]}
+  ];
+
+
+  tests.forEach(function(test) {
+    it('Board - ' + test.fen, function() {
+      var chess = new Chess(test.fen);
+      assert(JSON.stringify(chess.board()) === JSON.stringify(test.board));
+    })
+  })
+});
+
+describe('Regression Tests', function() {
+  it('Github Issue #32 - castling flag reappearing', function() {
     var chess = new Chess('b3k2r/5p2/4p3/1p5p/6p1/2PR2P1/BP3qNP/6QK b k - 2 28');
     chess.move({from:'a8', to:'g2'});
     assert(chess.fen() == '4k2r/5p2/4p3/1p5p/6p1/2PR2P1/BP3qbP/6QK w k - 0 29');
   });
 
-  test('Issue #58 - placing more than one king', function() {
+  it('Github Issue #58 - placing more than one king', function() {
     var chess = new Chess('N3k3/8/8/8/8/8/5b2/4K3 w - - 0 1');
     assert(chess.put({type: 'k', color: 'w'}, 'a1') == false);
     chess.put({type: 'q', color: 'w'}, 'a1');
     chess.remove('a1');
     assert(chess.moves().join(' ') == 'Kd2 Ke2 Kxf2 Kf1 Kd1');
   });
+
+  it('Github Issue #85 (white) - SetUp and FEN should be accepted in load_pgn', function() {
+       var chess = new Chess();
+       var pgn = ['[SetUp "1"]', '[FEN "7k/5K2/4R3/8/8/8/8/8 w KQkq - 0 1"]', "", '1. Rh6#'];
+       var result = chess.load_pgn(pgn.join("\n"));
+       assert(result);
+       assert(chess.fen() === '7k/5K2/7R/8/8/8/8/8 b KQkq - 1 1');
+  });
+
+  it('Github Issue #85 (black) - SetUp and FEN should be accepted in load_pgn', function() {
+       var chess = new Chess();
+       var pgn = ['[SetUp "1"]', '[FEN "r4r1k/1p4b1/3p3p/5qp1/1RP5/6P1/3NP3/2Q2RKB b KQkq - 0 1"]', "", '1. ... Qc5+'];
+       var result = chess.load_pgn(pgn.join("\n"));
+       assert(result);
+       assert(chess.fen() === 'r4r1k/1p4b1/3p3p/2q3p1/1RP5/6P1/3NP3/2Q2RKB w KQkq - 1 2');
+  });
+
+  it('Github Issue #98 (white) - Wrong movement number after setting a position via FEN', function () {
+    var chess = new Chess();
+    chess.load('4r3/8/2p2PPk/1p6/pP2p1R1/P1B5/2P2K2/3r4 w - - 1 45');
+    chess.move('f7');
+    var result = chess.pgn();
+    assert(result.match(/(45\. f7)$/));
+  })
+
+  it('Github Issue #98 (black) - Wrong movement number after setting a position via FEN', function () {
+    var chess = new Chess();
+    chess.load('4r3/8/2p2PPk/1p6/pP2p1R1/P1B5/2P2K2/3r4 b - - 1 45');
+    chess.move('Rf1+');
+    var result = chess.pgn();
+    assert(result.match(/(45\. \.\.\. Rf1\+)$/));
+  })
+
+  it('Github Issue #129 load_pgn() should not clear headers if PGN contains SetUp and FEN tags', function () {
+    var pgn = [
+      '[Event "Test Olympiad"]',
+      '[Site "Earth"]',
+      '[Date "????.??.??"]',
+      '[Round "6"]',
+      '[White "Testy"]',
+      '[Black "McTest"]',
+      '[Result "*"]',
+      '[FEN "rnbqkb1r/1p3ppp/p2ppn2/6B1/3NP3/2N5/PPP2PPP/R2QKB1R w KQkq - 0 1"]',
+      '[SetUp "1"]',
+      '',
+      '1.Qd2 Be7 *'
+    ];
+
+    var chess = new Chess();
+    var result = chess.load_pgn(pgn.join('\n'));
+    var expected = {
+      Event: 'Test Olympiad',
+      Site: 'Earth',
+      Date: '????.??.??',
+      Round: '6',
+      White: 'Testy',
+      Black: 'McTest',
+      Result: '*',
+      FEN: 'rnbqkb1r/1p3ppp/p2ppn2/6B1/3NP3/2N5/PPP2PPP/R2QKB1R w KQkq - 0 1',
+      SetUp: '1'
+    }
+    assert.deepEqual(chess.header(), expected);
+  })
+
+  it('Github Issue #129 clear() should clear the board and delete all headers with the exception of SetUp and FEN', function () {
+    var pgn = [
+      '[Event "Test Olympiad"]',
+      '[Site "Earth"]',
+      '[Date "????.??.??"]',
+      '[Round "6"]',
+      '[White "Testy"]',
+      '[Black "McTest"]',
+      '[Result "*"]',
+      '[FEN "rnbqkb1r/1p3ppp/p2ppn2/6B1/3NP3/2N5/PPP2PPP/R2QKB1R w KQkq - 0 1"]',
+      '[SetUp "1"]',
+      '',
+      '1.Qd2 Be7 *'
+    ];
+
+    var chess = new Chess();
+    var result = chess.load_pgn(pgn.join('\n'));
+    chess.clear();
+    var expected = {
+      FEN: '8/8/8/8/8/8/8/8 w - - 0 1',
+      SetUp: '1'
+    };
+    assert.deepEqual(chess.header(), expected);
+  })
 });
